@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ProductListView from './ProductListView'
+import * as MockProductsData from './mockProductsData'
 
 
 describe("Product List", () => {
@@ -23,28 +24,33 @@ describe("Product List", () => {
     expect(container.querySelector('div#productListView')).not.toBe('null')
   })
 
-  it('renders the product name', () => {
+  it('renders the product item', () => {
     
     // arrange
-    const products = [{ name: 'Sterling', id: 1}]
+    const products = MockProductsData.products1
 
     // act
     render(<ProductListView products={products} />)
 
     // assert
-    expect(container.textContent).toMatch('Sterling')
+    expect(container.textContent).toMatch('Sun Shine Swimming Pool')
+    expect(container.textContent).toMatch('1')
+    expect(container.textContent).toMatch('0')
+    expect(container.textContent).toMatch('3999')
   })
 
   it('renders multiple products', () => {
     
     // arrange
-    const products = [{ name: 'Hampton', id: 1 }, {name: 'Sterling', id: 2} ]
+    const products = MockProductsData.products
 
     // act
     render(<ProductListView products={products} />)
     // assert
-    expect(container.textContent).toMatch('Hampton')
-    expect(container.textContent).toMatch('Sterling')
+    expect(container.textContent).toMatch('Sun Shine Swimming Pool')
+    expect(container.textContent).toMatch('Stark')
+    expect(container.textContent).toMatch('Carlson')
+    expect(container.textContent).toMatch('Lark')
   })
 
 
