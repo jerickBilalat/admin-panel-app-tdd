@@ -4,7 +4,7 @@ import ProductListView from './ProductListView'
 import * as MockProductsData from './mockProductsData'
 
 
-describe("Product List", () => {
+describe("Product List render", () => {
   
   let container
 
@@ -53,5 +53,16 @@ describe("Product List", () => {
     expect(container.textContent).toMatch('Lark')
   })
 
+  it('initially shows a message saying there are no products', () => {
+    // arrange
+    const products = []
+
+    // act
+    render(<ProductListView products={products} />)
+
+    // assert
+    expect(container.textContent).toMatch('No Products')
+
+  }) 
 
 })
