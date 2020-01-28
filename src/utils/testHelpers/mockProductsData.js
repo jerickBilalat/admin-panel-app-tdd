@@ -101,3 +101,25 @@ export const products1 = [{
   "updatedAt": "2019-12-08T00:34:51.116Z",
   "__v": 0
 }]
+
+export const product = {
+    "productType": "swimming_pool",
+    "inStock": 1,
+    "sold": 0,
+    "publish": true,
+    "images": [
+        "https://res.cloudinary.com/minnesotarec/image/upload/v1575765282/mnhermanrex_unsigned/wzgax7ejqmz4rwbfyfeb.jpg"
+    ],
+    "_id": "5dec452ba6920d00175b848f",
+    "provider": "allamerican",
+    "name": "Sun Shine Swimming Pool",
+    "used": false,
+    "description": "Sun Shine Swimming Pool product description",
+    "price": "3999",
+    "spoolShape": "oval",
+    "spoolSize": "34x34",
+    "spoolHeight": "54",
+    "createdAt": "2019-12-08T00:34:51.116Z",
+    "updatedAt": "2019-12-08T00:34:51.116Z",
+    "__v": 0
+  };

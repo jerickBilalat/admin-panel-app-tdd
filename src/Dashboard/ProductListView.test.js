@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ProductListView from './ProductListView'
-import * as MockProductsData from './mockProductsData'
+import * as MockProductsData from '../utils/testHelpers/mockProductsData'
 
 
 describe("Product List render", () => {
