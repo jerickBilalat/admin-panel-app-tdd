@@ -30,7 +30,7 @@ describe('Product Form Render', () => {
     render(<ProductFormView />)
 
     // assert
-    const inputTextField = container.querySelector("form[id='productForm']").elements.productName
+    const inputTextField = container.querySelector("form[id='productForm']").elements.name
 
     expect(inputTextField).not.toBeNull()
     expect(inputTextField.tagName).toEqual('INPUT')
@@ -43,7 +43,7 @@ describe('Product Form Render', () => {
     render(<ProductFormView {...MockProductsData.product} />)
 
     // assert
-    const productNameInputTextField = container.querySelector("form[id='productForm']").elements.productName
+    const productNameInputTextField = container.querySelector("form[id='productForm']").elements.name
 
     expect(productNameInputTextField.value).toEqual('Sun Shine Swimming Pool')
   })
@@ -53,7 +53,7 @@ describe('Product Form Render', () => {
     render(<ProductFormView />)
 
     // assert
-    const productNameInputLabelField = container.querySelector("label[for='productName']")
+    const productNameInputLabelField = container.querySelector("label[for='name']")
     expect(productNameInputLabelField).not.toBeNull()
     expect(productNameInputLabelField.textContent).toEqual('Product Name')
     
@@ -64,14 +64,24 @@ describe('Product Form Render', () => {
     render(<ProductFormView />)
 
     // assert
-    const productNameInputTextField = container.querySelector("form[id='productForm']").elements.productName
-    expect(productNameInputTextField.id).toEqual('productName')
+    const productNameInputTextField = container.querySelector("form[id='productForm']").elements.name
+    expect(productNameInputTextField.id).toEqual('name')
     
+  })
+
+  it('renders a submit button', () => {
+    // act
+    render(<ProductFormView />)
+
+    // assert
+    expect(container.querySelector("input[type='submit']")).not.toBeNull()
   })
 
 })
 
 describe('Product Form Submittion', () => {
+  
+  // arrange
   let render, container
 
   beforeEach(() => {
@@ -83,11 +93,28 @@ describe('Product Form Submittion', () => {
     expect.hasAssertions()
 
     // arrange and assert
-    render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({productName}) => {
-      expect(productName).toEqual('Sun Shine Swimming Pool')
+    render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name}) => {
+      expect(name).toEqual('Sun Shine Swimming Pool')
     }} />)
 
+    // act
     await ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
 
   })
+
+  it('submits new values', async () => {
+    expect.hasAssertions()
+
+    // arrange and assert
+    render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name}) => {
+      expect(name).toEqual('new Product Name')
+    }} />)
+
+    // act
+    await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.name, {target: {name: 'name', value: 'new Product Name'}})
+    await ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
+
+  })
+
+
 })
