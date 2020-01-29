@@ -4,7 +4,7 @@ import * as MockProductsData from '../utils/testHelpers/mockProductsData'
 import ReactTestUtils from 'react-dom/test-utils'
 import ProductFormView from './ProductFormView'
 
-describe('Product Form Render', () => {
+describe('Product Form Render text fields', () => {
 
   // arrange
   let container, render
@@ -79,6 +79,69 @@ describe('Product Form Render', () => {
 
 })
 
+describe('Product Form render select fields', () => {
+  // arrange
+  let render, container
+  
+  beforeEach(() => {
+    ({render, container} = createContainer())
+  })
+
+  // helper
+  const queryFormById = id => container.querySelector(`form[id=${id}]`)
+  const queryFormFieldById = id => queryFormById('productForm').elements[`${id}`]
+  
+  it('renders select boxes', () => {
+    // act
+    render(<ProductFormView />)
+
+    // assert
+    expect(queryFormFieldById('productType')).not.toBeNull()
+    expect(queryFormFieldById('productType').tagName).toEqual('SELECT')
+  })
+
+  it('initially has a blank value choosen', () => {
+    // act
+    render(<ProductFormView />)
+
+    // assert
+    const firstOptionElement = queryFormFieldById('productType').childNodes[0]
+    expect(firstOptionElement.selected).toBeTruthy()
+    expect(firstOptionElement.textContent).toBe('none')
+  })
+
+  it('list all product types', () => {
+    // arrange
+    const productTypes = [ "type1", "type2"]
+
+    // act
+    render(<ProductFormView productTypes={productTypes} />)
+
+    // assert
+    const optionNodes = Array.from(queryFormFieldById('productType').childNodes)
+    const optionNodesValues = optionNodes.map( node => node.value )
+    const optionNodesTexts = optionNodes.map( node => node.textContent )
+    expect(optionNodesTexts).toEqual( expect.arrayContaining(productTypes))
+    expect(optionNodesValues).toEqual( expect.arrayContaining(productTypes))
+  })
+
+  it('pre-select existing values', () => {
+    // act
+    render(<ProductFormView {...MockProductsData.product} />)
+
+    // helper
+    const findSelectedOptionNode = (selectNode, selectedTextContent ) => {
+      const optionNodes = Array.from(selectNode.childNodes)
+      return optionNodes.find( node => node.textContent === selectedTextContent)
+    }
+    // assert
+    const preSelectedOption = findSelectedOptionNode(queryFormFieldById('productType'), 'swimming_pool')
+    expect(preSelectedOption.selected).toBeTruthy();
+    
+  })
+
+})
+
 describe('Product Form Submittion', () => {
   
   // arrange
@@ -93,8 +156,9 @@ describe('Product Form Submittion', () => {
     expect.hasAssertions()
 
     // arrange and assert
-    render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name}) => {
+    render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name, productType}) => {
       expect(name).toEqual('Sun Shine Swimming Pool')
+      expect(productType).toEqual('swimming_pool')
     }} />)
 
     // act
@@ -106,12 +170,14 @@ describe('Product Form Submittion', () => {
     expect.hasAssertions()
 
     // arrange and assert
-    render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name}) => {
+    render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name, productType}) => {
       expect(name).toEqual('new Product Name')
+      expect(productType).toEqual('new_product_type')
     }} />)
 
     // act
     await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.name, {target: {name: 'name', value: 'new Product Name'}})
+    await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.productType, {target: {name: 'productType', value: 'new_product_type'}})
     await ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
 
   })
