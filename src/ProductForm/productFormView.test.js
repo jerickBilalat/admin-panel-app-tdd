@@ -4,7 +4,7 @@ import * as MockProductsData from '../utils/testHelpers/mockProductsData'
 import ReactTestUtils from 'react-dom/test-utils'
 import ProductFormView from './ProductFormView'
 
-describe('Product Form Render text fields', () => {
+describe('Product Form Render basic fields', () => {
 
   // arrange
   let container, render
@@ -142,6 +142,40 @@ describe('Product Form render select fields', () => {
 
 })
 
+describe('Product form renders radion button fields', () => {
+  // arrange
+  let render, container
+
+  beforeEach(() => {
+    ({render, container} = createContainer())
+  })
+
+  // helpers
+  const queryFormById = id => container.querySelector(`form[id=${id}]`)
+  const queryFormFieldById = id => queryFormById('productForm').elements[`${id}`]
+
+  it('renders radio button fields', () => {
+    // act
+    render(<ProductFormView />)
+    
+    // assert
+    const usedRadioButton = queryFormFieldById('used')
+    expect(usedRadioButton).toBeDefined()
+    expect(usedRadioButton).not.toBeNull()
+    expect(usedRadioButton.tagName).toEqual('INPUT')
+    expect(usedRadioButton.type).toEqual('radio')
+  })
+
+  it('renders existing value', () => {
+    // act
+    render(<ProductFormView {...MockProductsData.product} />)
+
+    // assert
+    expect(queryFormFieldById('used').checked).not.toBeTruthy()
+  })
+
+})
+
 describe('Product Form Submittion', () => {
   
   // arrange
@@ -156,9 +190,10 @@ describe('Product Form Submittion', () => {
     expect.hasAssertions()
 
     // arrange and assert
-    render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name, productType}) => {
+    render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name, productType, used}) => {
       expect(name).toEqual('Sun Shine Swimming Pool')
       expect(productType).toEqual('swimming_pool')
+      expect(used).not.toBeTruthy()
     }} />)
 
     // act
@@ -170,14 +205,16 @@ describe('Product Form Submittion', () => {
     expect.hasAssertions()
 
     // arrange and assert
-    render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name, productType}) => {
+    render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name, productType, used}) => {
       expect(name).toEqual('new Product Name')
       expect(productType).toEqual('new_product_type')
+      expect(used).toBeTruthy()
     }} />)
 
     // act
     await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.name, {target: {name: 'name', value: 'new Product Name'}})
     await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.productType, {target: {name: 'productType', value: 'new_product_type'}})
+    await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.used, {target: {name: 'used', value: true}})
     await ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
 
   })
