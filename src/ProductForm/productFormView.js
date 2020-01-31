@@ -1,13 +1,19 @@
 import React from 'react'
 
-const ProductForm = ({name, used, productType, doSaveProduct, productTypes}) => {
+const ProductForm = ({name, used, productType, productTypes}) => {
   const [product, setProduct] = React.useState({name, productType, used})
 
   const doHandleFieldChange = ({target}) => {
     setProduct(prevProduct => ({...prevProduct , [target.name]: target.value}))
   }
+
+  const doHandleSubmit = () => {
+  window.fetch('/product', {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify(product)})
+  }
+
   return (
-    <form id="productForm" onSubmit={() => doSaveProduct(product)}>
+    <form id="productForm" onSubmit={doHandleSubmit}>
       <select name="productType" id="productType" value={productType} onChange={doHandleFieldChange}>
         <option>none</option>
         {productTypes.map( type => <option key={type} value={type}>{type}</option>)}

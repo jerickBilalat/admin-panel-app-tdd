@@ -177,47 +177,179 @@ describe('Product form renders radion button fields', () => {
 })
 
 describe('Product Form Submittion', () => {
+
+  // shared arrange
+  const originalFetch = window.fetch;
+  let fetchSpy;
   
-  // arrange
   let render, container
 
   beforeEach(() => {
+    // shared arrange
     ({render, container} = createContainer())
+    window.fetch = jest.fn()
+    fetchSpy = window.fetch
+  })
+
+  afterEach(() => {
+    // shared clean up
+    window.fetch = originalFetch
+  })
+
+  
+
+  it('calls fetch with the right arguments when submitted', async () => {
+
+    // arrange
+    render(<ProductFormView />)
+
+    // act
+    await ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
+
+    // assert
+    expect(fetchSpy).toHaveBeenCalled()
+    expect(fetchSpy).toBeCalledWith(expect.anything(), {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json'}, body: expect.anything()})
+
   })
 
 
   it('submits existing values', async () => {
-    expect.hasAssertions()
 
-    // arrange and assert
-    render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name, productType, used}) => {
-      expect(name).toEqual('Sun Shine Swimming Pool')
-      expect(productType).toEqual('swimming_pool')
-      expect(used).not.toBeTruthy()
-    }} />)
+    // arrange
+    render(<ProductFormView {...MockProductsData.product} />)
 
     // act
     await ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
+
+
+    // assert
+    expect(fetchSpy).toHaveBeenCalled()
+    
+    expect(fetchSpy).toBeCalledWith(expect.anything(), {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json'},
+      body: expect.anything()
+    })
+
+    expect(MockProductsData.product).toMatchObject(JSON.parse(fetchSpy.mock.calls[0][1].body))
 
   })
 
   it('submits new values', async () => {
-    expect.hasAssertions()
 
-    // arrange and assert
-    render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name, productType, used}) => {
-      expect(name).toEqual('new Product Name')
-      expect(productType).toEqual('new_product_type')
-      expect(used).toBeTruthy()
-    }} />)
+    // arrange
+    render(<ProductFormView {...MockProductsData.product} />)
+
+    const newValues = {
+      name: "new name",
+      productType: "new type",
+      used: true
+    }
 
     // act
-    await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.name, {target: {name: 'name', value: 'new Product Name'}})
-    await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.productType, {target: {name: 'productType', value: 'new_product_type'}})
-    await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.used, {target: {name: 'used', value: true}})
+    await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.name, {target: {name: 'name', value: newValues.name}})
+    await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.productType, {target: {name: 'productType', value: newValues.productType}})
+    await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.used, {target: {name: 'used', value: newValues.used}})
     await ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
+
+
+    // assert
+    expect(fetchSpy).toHaveBeenCalled()
+    expect(fetchSpy).toBeCalledWith(expect.anything(), {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json'},
+      body: expect.anything()
+    })
+    const parsedBody = JSON.parse(fetchSpy.mock.calls[0][1].body)
+    expect(newValues).toEqual(parsedBody)
 
   })
 
 
+
 })
+
+// Previors and ways to unit test the form submition. See Book for more
+//   it('submits existing values', async () => {
+//     expect.hasAssertions()
+
+//     // arrange and assert
+//     render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name, productType, used}) => {
+//       expect(name).toEqual('Sun Shine Swimming Pool')
+//       expect(productType).toEqual('swimming_pool')
+//       expect(used).not.toBeTruthy()
+//     }} />)
+
+//     // act
+//     await ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
+
+//   })
+
+//   it('submits existing values using the variable technique', async () => {
+//     // arrange
+//     let onSubmitArgs
+
+//     render(<ProductFormView {...MockProductsData.product} doSaveProduct={ product => {
+//       onSubmitArgs = product
+//     }} />)
+
+//     // act
+//     await ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
+    
+//     // assert
+//     expect(MockProductsData.product).toMatchObject(onSubmitArgs)
+//   })
+
+//   it('submits existing values using a custom spy', async () => {
+//     // arrange
+//     const spy = () => {
+//       let receivedArgs
+//       return {
+//         fn: args => receivedArgs = args,
+//         receivedArgs: () => receivedArgs,
+//         receivedArg: n => receivedArgs[n] 
+//       }
+//     }
+
+//     let submitSpy = spy()
+
+//     render(<ProductFormView {...MockProductsData.product} doSaveProduct={submitSpy.fn} />)
+
+//     // act
+//     await ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
+
+//     // assert
+//     expect(MockProductsData.product).toMatchObject(submitSpy.receivedArgs())
+
+//   })
+
+//   it('submits existing values using a jest spy', async () => {
+//     let submitSpy = jest.fn()
+
+//     render(<ProductFormView {...MockProductsData.product} doSaveProduct={submitSpy} />)
+
+//     // act
+//     await ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
+
+//     // assert
+//     expect(submitSpy).toHaveBeenCalled()
+//     expect(submitSpy).toHaveBeenCalledWith({
+//       name: MockProductsData.product.name,
+//       productType: MockProductsData.product.productType,
+//       used: MockProductsData.product.used
+//     })
+//   })
+  
+//   it('submits new values', async () => {
+//     expect.hasAssertions()
+
+//     // arrange and assert
+//     render(<ProductFormView {...MockProductsData.product} doSaveProduct={ ({name, productType, used}) => {
+//       expect(name).toEqual('new Product Name')
+//       expect(productType).toEqual('new_product_type')
+//       expect(used).toBeTruthy()
+//     }} />)
+
+//     // act
+//     await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.name, {target: {name: 'name', value: 'new Product Name'}})
+//     await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.productType, {target: {name: 'productType', value: 'new_product_type'}})
+//     await ReactTestUtils.Simulate.change(container.querySelector("form[id='productForm']").elements.used, {target: {name: 'used', value: true}})
+//     await ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
+
+//   })
