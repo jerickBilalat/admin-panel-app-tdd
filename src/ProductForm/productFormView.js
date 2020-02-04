@@ -1,15 +1,26 @@
 import React from 'react'
 
-const ProductForm = ({name, used, productType, productTypes}) => {
+const ProductForm = ({name, used, productType, productTypes, doNotifyOnSave}) => {
   const [product, setProduct] = React.useState({name, productType, used})
 
   const doHandleFieldChange = ({target}) => {
     setProduct(prevProduct => ({...prevProduct , [target.name]: target.value}))
   }
 
-  const doHandleSubmit = () => {
-  window.fetch('/product', {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json'},
-  body: JSON.stringify(product)})
+  const doHandleSubmit = async (event) => {
+    event.preventDefault()
+    try {
+      const response = await window.fetch('/product', {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(product)})
+
+      const result = await response.json()
+      doNotifyOnSave(result)
+
+    } catch (error) {
+      console.log(error)
+    }
+    
+    
   }
 
   return (
@@ -25,5 +36,5 @@ const ProductForm = ({name, used, productType, productTypes}) => {
     </form>
   )
 }
-ProductForm.defaultProps = {productTypes: ['pool_table', 'swimming_pool', 'misc']}
+ProductForm.defaultProps = {productTypes: ['pool_table', 'swimming_pool', 'misc'], doNotifyOnSave: () => {}}
 export default ProductForm

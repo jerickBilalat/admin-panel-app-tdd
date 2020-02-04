@@ -1,7 +1,7 @@
 import React from 'react'
 import {createContainer} from '../utils/testHelpers/domManipulators'
 import * as MockProductsData from '../utils/testHelpers/mockProductsData'
-import ReactTestUtils from 'react-dom/test-utils'
+import ReactTestUtils, {act} from 'react-dom/test-utils'
 import ProductFormView from './ProductFormView'
 
 describe('Product Form Render basic fields', () => {
@@ -189,6 +189,7 @@ describe('Product Form Submittion', () => {
     ({render, container} = createContainer())
     window.fetch = jest.fn()
     fetchSpy = window.fetch
+    fetchSpy.mockImplementation( () => Promise.resolve({ ok: true, json: () => Promise.resolve({...MockProductsData.product}) }))
   })
 
   afterEach(() => {
@@ -196,7 +197,19 @@ describe('Product Form Submittion', () => {
     window.fetch = originalFetch
   })
 
-  
+  it('prevents default action when submitting a form', async () => {
+    // ararnge
+    render(<ProductFormView />)
+    const preventDefaultSpy = jest.fn()
+    //act
+    await ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"), {
+      preventDefault: preventDefaultSpy
+    })
+
+    // assert
+    expect(preventDefaultSpy).toHaveBeenCalled()
+
+  })
 
   it('calls fetch with the right arguments when submitted', async () => {
 
@@ -212,9 +225,43 @@ describe('Product Form Submittion', () => {
 
   })
 
+  it('notifies when form is sumitted', async () => {
+    // ararnge
+    const doNotifyOnSaveSpy = jest.fn()
+
+    render(<ProductFormView doNotifyOnSave={doNotifyOnSaveSpy} />)
+
+    // act
+    await act( async () => {
+      ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
+    })
+
+    // assert
+    expect(doNotifyOnSaveSpy).toHaveBeenCalled()
+    expect(doNotifyOnSaveSpy).toHaveBeenCalledWith(expect.objectContaining({...MockProductsData.product}))
+
+  })
+
+  it('does NOT notify when form is sumition POST request returned an error', async () => {
+    // ararnge
+    const doNotifyOnSaveSpy = jest.fn()
+    fetchSpy.mockImplementation(() => Promise.reject({ok: false}) )
+
+    render(<ProductFormView doNotifyOnSave={doNotifyOnSaveSpy} />)
+
+    // act
+    await act( async () => {
+      ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
+    })
+
+    // assert
+    expect(doNotifyOnSaveSpy).not.toHaveBeenCalled()
+
+  })
+
 
   it('submits existing values', async () => {
-
+ 
     // arrange
     render(<ProductFormView {...MockProductsData.product} />)
 
