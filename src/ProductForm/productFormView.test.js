@@ -259,6 +259,22 @@ describe('Product Form Submittion', () => {
 
   })
 
+  it('it renders error message when POST request returned an error', async () => {
+    // arrange
+    fetchSpy.mockImplementation(() => Promise.reject({ok: false}) )
+    
+    // act
+    render(<ProductFormView />)
+    await act( async () => {
+      ReactTestUtils.Simulate.submit(container.querySelector("form[id='productForm']"))
+    })
+
+    // assert
+    expect(container.querySelector('.error')).not.toBeNull()
+    expect(container.querySelector('.error').textContent).toEqual('There is an error. Please try again.')
+
+  })
+
 
   it('submits existing values', async () => {
  
@@ -272,7 +288,7 @@ describe('Product Form Submittion', () => {
     // assert
     expect(fetchSpy).toHaveBeenCalled()
     
-    expect(fetchSpy).toBeCalledWith(expect.anything(), {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json'},
+    expect(fetchSpy).toBeCalledWith('/product', {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/json'},
       body: expect.anything()
     })
 

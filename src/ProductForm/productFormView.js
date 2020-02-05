@@ -2,6 +2,7 @@ import React from 'react'
 
 const ProductForm = ({name, used, productType, productTypes, doNotifyOnSave}) => {
   const [product, setProduct] = React.useState({name, productType, used})
+  const [error, setError] = React.useState(false)
 
   const doHandleFieldChange = ({target}) => {
     setProduct(prevProduct => ({...prevProduct , [target.name]: target.value}))
@@ -17,7 +18,9 @@ const ProductForm = ({name, used, productType, productTypes, doNotifyOnSave}) =>
       doNotifyOnSave(result)
 
     } catch (error) {
-      console.log(error)
+      if(!error.ok) {
+        setError(true)
+      }
     }
     
     
@@ -25,6 +28,7 @@ const ProductForm = ({name, used, productType, productTypes, doNotifyOnSave}) =>
 
   return (
     <form id="productForm" onSubmit={doHandleSubmit}>
+      {error && <p className="error">There is an error. Please try again.</p>}
       <select name="productType" id="productType" value={productType} onChange={doHandleFieldChange}>
         <option>none</option>
         {productTypes.map( type => <option key={type} value={type}>{type}</option>)}
