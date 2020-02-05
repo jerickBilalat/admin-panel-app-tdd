@@ -3,6 +3,7 @@ import {createContainer} from '../utils/testHelpers/domManipulators'
 import * as MockProductsData from '../utils/testHelpers/mockProductsData'
 import ReactTestUtils, {act} from 'react-dom/test-utils'
 import ProductFormView from './ProductFormView'
+import 'whatwg-fetch'
 
 describe('Product Form Render basic fields', () => {
 
@@ -178,23 +179,21 @@ describe('Product form renders radion button fields', () => {
 
 describe('Product Form Submittion', () => {
 
-  // shared arrange
-  const originalFetch = window.fetch;
-  let fetchSpy;
+  //shared arrange
+  let fetchSpy
   
   let render, container
 
   beforeEach(() => {
     // shared arrange
     ({render, container} = createContainer())
-    window.fetch = jest.fn()
-    fetchSpy = window.fetch
-    fetchSpy.mockImplementation( () => Promise.resolve({ ok: true, json: () => Promise.resolve({...MockProductsData.product}) }))
+    fetchSpy = jest.spyOn(window, 'fetch')
+    fetchSpy.mockImplementation(() => Promise.resolve({ ok: true, json: () => Promise.resolve({...MockProductsData.product}) }))
   })
 
   afterEach(() => {
     // shared clean up
-    window.fetch = originalFetch
+    window.fetch.mockRestore()
   })
 
   it('prevents default action when submitting a form', async () => {
