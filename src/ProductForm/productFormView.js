@@ -1,6 +1,6 @@
 import React from 'react'
 
-const ProductForm = ({name, used, productType, productTypes, doNotifyOnSave}) => {
+export const ProductFormView = ({name, used, productType, productTypes, doNotifyOnSave}) => {
   const [product, setProduct] = React.useState({name, productType, used})
   const [error, setError] = React.useState(false)
 
@@ -40,5 +40,4 @@ const ProductForm = ({name, used, productType, productTypes, doNotifyOnSave}) =>
     </form>
   )
 }
-ProductForm.defaultProps = {productTypes: ['pool_table', 'swimming_pool', 'misc'], doNotifyOnSave: () => {}}
-export default ProductForm
+ProductFormView.defaultProps = {productTypes: ['pool_table', 'swimming_pool', 'misc'], doNotifyOnSave: () => {}}

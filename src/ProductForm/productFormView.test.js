@@ -2,7 +2,7 @@ import React from 'react'
 import {createContainer} from '../utils/testHelpers/domManipulators'
 import * as MockProductsData from '../utils/testHelpers/mockProductsData'
 import ReactTestUtils, {act} from 'react-dom/test-utils'
-import ProductFormView from './ProductFormView'
+import {ProductFormView} from './ProductFormView'
 import 'whatwg-fetch'
 
 describe('Product Form Render basic fields', () => {
