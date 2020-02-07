@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default ({products}) => {
+export const ProductListView = ({products}) => {
 return (
   <div id="productListView" >
     {products.length

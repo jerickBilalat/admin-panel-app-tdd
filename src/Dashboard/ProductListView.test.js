@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ProductListView from './ProductListView'
+import {ProductListView} from './ProductListView'
 import * as MockProductsData from '../utils/testHelpers/mockProductsData'
 
 
