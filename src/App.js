@@ -1,26 +1,27 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {ProductListViewLoader} from './Dashboard/ProductListViewLoader'
+import {ProductFormLoader} from './ProductForm/productFormLoader'
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [view, setView] = React.useState('product_list_view')
+
+  function renderView(view) {
+    switch(view) {
+      case 'product_form':
+        return <ProductFormLoader onSave={() => setView('product_list_view')} />
+      default:
+        return (
+          <React.Fragment>
+            <div className='add-button'>
+              <button onClick={ () => setView('product_form') }>Add Product</button>        
+            </div>
+            <ProductListViewLoader />
+          </React.Fragment>
+        ) 
+    }
+  }
+
+  return renderView(view)
 }
 
 export default App;

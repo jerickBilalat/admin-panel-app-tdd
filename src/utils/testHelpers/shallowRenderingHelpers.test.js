@@ -1,13 +1,14 @@
 import React from 'react'
-import {createShallowRenderer, childrenOf, type, id, className, click} from './shallowRenderingHelpers'
+import {createShallowRenderer, getChildrenOf, type, id, className, click} from './shallowRenderingHelpers'
+import ShallowRenderer from 'react-test-renderer/shallow'
 
-describe('childrenOf', () => {
+describe('getChildrenOf', () => {
   it('returns no children', () => {
-    expect(childrenOf(<div />)).toEqual([])
+    expect(getChildrenOf(<div />)).toEqual([])
   })
 
   it('it resturns direct children', () => {
-    expect(childrenOf(
+    expect(getChildrenOf(
     <div>
       <p>a</p>
       <p>b</p>
@@ -16,22 +17,22 @@ describe('childrenOf', () => {
   })
 
   it('it returns text as array of one item', () => {
-    expect(childrenOf(
+    expect(getChildrenOf(
     <div>
       text
     </div>)).toEqual(['text'])
   })
 
   it('it returns no children for text nodes', () => {
-    expect(childrenOf('text')).toEqual([])
+    expect(getChildrenOf('text')).toEqual([])
   })
 
   it('it returns no children for text nodes', () => {
-    expect(childrenOf('text')).toEqual([])
+    expect(getChildrenOf('text')).toEqual([])
   })
 
   it('it returns an array of children for element with one child', () => {
-    expect(childrenOf(
+    expect(getChildrenOf(
       <div>
         <p>b</p>
       </div>)).toEqual([<p>b</p>])
@@ -41,16 +42,16 @@ describe('childrenOf', () => {
 
 const TestComponent = ({children}) => (<React.Fragment>{children}</React.Fragment>) // need this because shallow renderer does not accept primitive component types susch <div></div>
 
-describe('child', () => {
-  let render, child
+describe('getNthChild', () => {
+  let render, getNthChild
 
   beforeEach( () => {
-    ({render, child} = createShallowRenderer())
+    ({render, getNthChild} = createShallowRenderer())
   })
 
   it('returns undefined if the child does not exist', () => {
     render(<TestComponent />)
-    expect(child(0)).not.toBeDefined()
+    expect(getNthChild(0)).not.toBeDefined()
   })
 
   it('returns child of rendered elements', () => {
@@ -60,16 +61,16 @@ describe('child', () => {
       <p>b</p>
     </TestComponent>)
 
-    expect(child(1)).toEqual(<p>b</p>)
+    expect(getNthChild(1)).toEqual(<p>b</p>)
   })
 
 })
 
-describe('elementsMatching', () => {
-  let render, elementsMatching, firstElementMatching
+describe('getAllElementsMatching', () => {
+  let render, getAllElementsMatching, getFirstElementMatching
 
   beforeEach( () => {
-    ({render, elementsMatching, firstElementMatching} = createShallowRenderer())
+    ({render, getAllElementsMatching, getFirstElementMatching} = createShallowRenderer())
   }) 
 
   it('finds multiple direct children', () => {
@@ -80,7 +81,7 @@ describe('elementsMatching', () => {
       </TestComponent>
     )
 
-    expect(elementsMatching(type('p')))
+    expect(getAllElementsMatching(type('p')))
       .toEqual([
         <p>a</p>,
         <p>b</p>
@@ -96,22 +97,30 @@ describe('elementsMatching', () => {
       </TestComponent>
     )
 
-    expect(elementsMatching(type('p'))).toEqual([<p>a</p>])
+    expect(getAllElementsMatching(type('p'))).toEqual([<p>a</p>])
 
   })
 
-  it('find first direct children', () => {
-    render(
-      <TestComponent>
-        <div>
-           <p>a</p>
-        </div>
-        <p><div>b</div></p>
-        <p><div>c</div></p>
-      </TestComponent>
-    )
+  it('find first direct child', () => {
+    const renderer = new ShallowRenderer()
 
-    expect(firstElementMatching(type('p'))).toEqual(<p>a</p>)
+    renderer.render(<TestComponent>
+      <div className='add-button'>
+         <p>a</p>
+      </div>
+      <p><div>b</div></p>
+      <p><div>c</div></p>
+    </TestComponent>)
+
+    const output = renderer.getRenderOutput().props.children.filter( x => x.props.className && x.props.className === 'add-button')[0]
+
+    expect(output)
+    .toEqual(
+      <div className="add-button">
+        <p>a</p>
+      </div>
+    )
+    
   })
 
 })
